@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DressSync — Sync Your Closet. Master Your Style.</title>
+  <style>
+    :root {
+      --bg: #0d0f17;
+      --card-bg: #161926;
+      --primary: #8b5cf6;
+      --primary-hover: #7c3aed;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #2e344e;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+
+    /* Navigation */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 8%;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: var(--primary);
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-auth {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-auth:hover {
+      background: #202538;
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 80px 20px 40px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    /* "Start Dressing" Interactive Demo Box */
+    .dressing-box {
+      max-width: 600px;
+      margin: 40px auto 0;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      text-align: left;
+    }
+
+    .dressing-box h3 {
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .input-group select {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .result-card {
+      margin-top: 24px;
+      padding: 16px;
+      background: var(--bg);
+      border-radius: 8px;
+      border: 1px dashed var(--primary);
+      display: none;
+    }
+
+    .result-card h4 {
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    /* Features Grid */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 80px auto 0;
+      padding: 0 20px;
+    }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 24px;
+      border-radius: 12px;
+    }
+
+    .feature-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="logo">Dress<span>Sync</span></div>
+    <div class="auth-buttons">
+      <button class="btn-auth" onclick="alert('Google Sign-In will connect to Firebase Auth!')">
+        Continue with Google
+      </button>
+      <button class="btn-auth" onclick="alert('Facebook Sign-In will connect to Firebase Auth!')">
+        Continue with Facebook
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Sync Your Closet.<br/>Master Your Style.</h1>
+    <p>Snap photos of your clothes, strip backgrounds automatically, and let AI build perfect daily outfits matched to weather and vibe.</p>
+    
+    <!-- Interactive Demo Widget -->
+    <div class="dressing-box">
+      <h3>⚡ Try the "Start Dressing" Demo</h3>
+      
+      <div class="input-group">
+        <label for="weather">What's the weather like?</label>
+        <select id="weather">
+          <option>☀️ Warm & Sunny (25°C)</option>
+          <option>☁️ Cool & Breezy (18°C)</option>
+          <option>🌧️ Cold & Rainy (12°C)</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="occasion">Where are you going?</label>
+        <select id="occasion">
+          <option>Casual Cafe / Hangout</option>
+          <option>Work / Office</option>
+          <option>Date Night</option>
+          <option>Gym / Workout</option>
+        </select>
+      </div>
+
+      <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="generateOutfit()">
+        Start Dressing
+      </button>
+
+      <div class="result-card" id="outfitResult">
+        <h4>✨ Recommended Outfit Result:</h4>
+        <p id="outfitText"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Features -->
+  <section class="features">
+    <div class="feature-card">
+      <h3>📸 Background Removal</h3>
+      <p>Upload any picture of a shirt or pants—our system isolates the clothing item into a clean digital wardrobe PNG.</p>
+    </div>
+    <div class="feature-card">
+      <h3>🌤️ Smart Context</h3>
+      <p>Auto-detects live temperature and weather so you stay comfortable and styled everywhere you go.</p>
+    </div>
+    <div class="feature-card">
+      <h3>🎨 Style Harmony</h3>
+      <p>Built-in color wheel algorithms ensure tops, bottoms, and footwear never clash.</p>
+    </div>
+  </section>
+
+  <script>
+    function generateOutfit() {
+      const weather = document.getElementById('weather').value;
+      const occasion = document.getElementById('occasion').value;
+      const resultBox = document.getElementById('outfitResult');
+      const text = document.getElementById('outfitText');
+
+      let recommendation = "";
+
+      if (weather.includes("Warm")) {
+        recommendation = "White Crewneck T-Shirt + Light Denim Shorts + Clean White Canvas Sneakers.";
+      } else if (weather.includes("Cool")) {
+        recommendation = "Navy Blue Denim Jacket + Plain White Tee + Black Slim Chinos + White Sneakers.";
+      } else {
+        recommendation = "Dark Charcoal Trench Coat + Oversized Hoodie + Black Trousers + Leather Boots.";
+      }
+
+      text.innerHTML = `<strong>Selected Context:</strong> ${occasion} (${weather})<br/><strong>AI Suggestion:</strong> ${recommendation}`;
+      resultBox.style.display = "block";
+    }
+  </script>
+</body>
+</html>
