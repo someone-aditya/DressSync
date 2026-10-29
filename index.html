@@ -97,7 +97,7 @@
       display: block;
     }
 
-    /* Form & Input Elements */
+    /* Cards & Form Elements */
     .card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -120,20 +120,6 @@
 
     .btn-primary:hover {
       background: var(--primary-hover);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-outline:hover {
-      background: var(--card-hover);
     }
 
     .form-grid {
@@ -160,7 +146,43 @@
       font-size: 0.95rem;
     }
 
-    /* Wardrobe Category Tags & Items Grid */
+    /* Camera & Photo Input Buttons */
+    .photo-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-camera {
+      background: var(--card-hover);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex: 1;
+    }
+
+    .btn-camera:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .image-preview {
+      margin-top: 10px;
+      max-height: 100px;
+      border-radius: 8px;
+      display: none;
+      object-fit: contain;
+      border: 1px solid var(--border);
+    }
+
+    /* Category Filter Chips & Grid */
     .category-filter {
       display: flex;
       gap: 8px;
@@ -198,7 +220,6 @@
       border-radius: 10px;
       padding: 16px;
       text-align: center;
-      position: relative;
     }
 
     .item-card img {
@@ -218,7 +239,6 @@
       color: var(--text-muted);
     }
 
-    /* Recommendation Showcase */
     .outfit-display {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -266,9 +286,9 @@
       <div class="card">
         <h3>🚀 Quick Start Guide</h3>
         <ol style="margin-left: 20px; color: var(--text-muted); line-height: 2;">
-          <li>Click <strong>"My Wardrobe"</strong> to add clothes across categories like Shirts, Hoodies, Pants, Shoes, and Accessories.</li>
-          <li>Go to <strong>"Start Dressing"</strong> to select your weather, time, and occasion.</li>
-          <li>DressSync will randomize and pick the best combinations directly from your actual wardrobe!</li>
+          <li>Go to <strong>"My Wardrobe"</strong> and click <strong>📸 Snap Photo</strong> to take a photo of your clothes directly!</li>
+          <li>Select the category (Shirts, Hoodies, Shorts, Shoes, Accessories, etc.).</li>
+          <li>Go to <strong>"Start Dressing"</strong> to generate outfit pairs built directly from your uploaded clothes!</li>
         </ol>
       </div>
     </section>
@@ -279,14 +299,15 @@
         <h2>My Digital Wardrobe</h2>
       </div>
 
-      <!-- Add New Item Form -->
+      <!-- Add New Item Form with Camera Capture -->
       <div class="card">
-        <h3>➕ Add Item to Wardrobe</h3>
+        <h3>📸 Snap & Add Item to Wardrobe</h3>
         <div class="form-grid" style="margin-top: 16px;">
           <div class="input-group">
             <label>Item Name</label>
-            <input type="text" id="itemName" placeholder="e.g. Vintage Denim Jacket">
+            <input type="text" id="itemName" placeholder="e.g. My Favorite Oversized Hoodie">
           </div>
+          
           <div class="input-group">
             <label>Category</label>
             <select id="itemCategory">
@@ -304,12 +325,27 @@
               <option>Shoes / Sneakers</option>
             </select>
           </div>
+
           <div class="input-group">
-            <label>Image URL (or mock image)</label>
-            <input type="text" id="itemImg" placeholder="https://via.placeholder.com/150">
+            <label>Capture Image</label>
+            <div class="photo-buttons">
+              <!-- Live Camera Trigger -->
+              <label class="btn-camera">
+                📸 Snap Photo
+                <input type="file" accept="image/*" capture="environment" id="cameraInput" style="display: none;" onchange="previewPhoto(this)">
+              </label>
+
+              <!-- Upload File Trigger -->
+              <label class="btn-camera">
+                📁 Upload File
+                <input type="file" accept="image/*" id="fileInput" style="display: none;" onchange="previewPhoto(this)">
+              </label>
+            </div>
+            <img id="photoPreview" class="image-preview" alt="Preview">
           </div>
         </div>
-        <button class="btn-primary" onclick="addItem()">Add to Closet</button>
+
+        <button class="btn-primary" onclick="addPhotoItem()">Add to Closet</button>
       </div>
 
       <!-- Category Filter Chips -->
@@ -319,7 +355,7 @@
 
       <!-- Items Grid -->
       <div class="items-grid" id="wardrobeGrid">
-        <div class="empty-state">No items added yet. Click "+ Add Starter Wardrobe" or enter custom items above!</div>
+        <div class="empty-state">No items added yet. Take a photo above or click "+ Add Starter Wardrobe"!</div>
       </div>
     </section>
 
@@ -370,15 +406,14 @@
   </main>
 
   <script>
-    // Categories List
     const categories = [
       "Hats", "Glasses", "Accessories", "Shirts / T-Shirts", 
       "Hoodies", "Jackets", "Jeans", "Lower / Joggers", 
       "Pants / Formal", "Shorts", "Socks", "Shoes / Sneakers"
     ];
 
-    // Closet Data Store
     let wardrobe = [];
+    let currentPhotoData = null;
 
     // Initialize Category Filters
     function initFilters() {
@@ -392,7 +427,7 @@
       });
     }
 
-    // Switch Nav Tabs
+    // Switch Tabs
     function switchTab(tabId) {
       document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -401,25 +436,40 @@
       event.currentTarget.classList.add('active');
     }
 
-    // Add Single Item
-    function addItem(nameInput, catInput, imgInput) {
-      const name = nameInput || document.getElementById('itemName').value;
-      const category = catInput || document.getElementById('itemCategory').value;
-      const img = imgInput || document.getElementById('itemImg').value || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&auto=format&fit=crop';
+    // Preview Snapped / Uploaded Photo
+    function previewPhoto(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          currentPhotoData = e.target.result;
+          const imgPreview = document.getElementById('photoPreview');
+          imgPreview.src = currentPhotoData;
+          imgPreview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Add Photo Item
+    function addPhotoItem() {
+      const name = document.getElementById('itemName').value;
+      const category = document.getElementById('itemCategory').value;
+      const img = currentPhotoData || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&auto=format&fit=crop';
 
       if (!name) return alert('Please enter an item name!');
 
       wardrobe.push({ id: Date.now(), name, category, img });
-      
-      if (!nameInput) {
-        document.getElementById('itemName').value = '';
-        document.getElementById('itemImg').value = '';
-      }
+
+      // Reset form
+      document.getElementById('itemName').value = '';
+      document.getElementById('photoPreview').style.display = 'none';
+      currentPhotoData = null;
 
       updateUI();
+      alert('Clothing item added to your wardrobe!');
     }
 
-    // Load Default Starter Items
+    // Add Starter Wardrobe Sample Data
     function loadSampleItems() {
       const samples = [
         { name: "Black Baseball Cap", category: "Hats", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=200&auto=format&fit=crop" },
@@ -431,11 +481,12 @@
         { name: "White Canvas Sneakers", category: "Shoes / Sneakers", img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&auto=format&fit=crop" }
       ];
 
-      samples.forEach(s => addItem(s.name, s.category, s.img));
+      samples.forEach(s => wardrobe.push({ id: Date.now() + Math.random(), name: s.name, category: s.category, img: s.img }));
+      updateUI();
       alert('Starter wardrobe loaded successfully!');
     }
 
-    // Update Dashboard & Wardrobe Grid
+    // Update Grid & Stats
     function updateUI(filteredCat = 'All') {
       const grid = document.getElementById('wardrobeGrid');
       grid.innerHTML = '';
@@ -458,7 +509,6 @@
         });
       }
 
-      // Update Dashboard Stats
       document.getElementById('totalCount').innerText = wardrobe.length;
       const populatedCategories = new Set(wardrobe.map(i => i.category)).size;
       document.getElementById('catCount').innerText = populatedCategories;
@@ -471,27 +521,24 @@
       updateUI(cat);
     }
 
-    // Outfit Randomizer Logic based on Context
+    // Outfit Combination Generator
     function generateCombination() {
       if (wardrobe.length === 0) {
-        return alert("Your wardrobe is empty! Add items or click '+ Add Starter Wardrobe' first.");
+        return alert("Your wardrobe is empty! Take a photo of clothes or click '+ Add Starter Wardrobe' first.");
       }
 
       const weather = document.getElementById('genWeather').value;
       const time = document.getElementById('genTime').value;
       const occasion = document.getElementById('genOccasion').value;
 
-      // Group wardrobe items by category
       const grouped = {};
       wardrobe.forEach(item => {
         if (!grouped[item.category]) grouped[item.category] = [];
         grouped[item.category].push(item);
       });
 
-      // Selection logic based on weather
       let selectedOutfit = [];
 
-      // Helper to pick random item from category array
       const pickRandom = (catName) => {
         if (grouped[catName] && grouped[catName].length > 0) {
           const list = grouped[catName];
@@ -500,7 +547,6 @@
         return null;
       };
 
-      // 1. Tops Selection
       if (weather.includes("Cold")) {
         const top = pickRandom("Hoodies") || pickRandom("Jackets") || pickRandom("Shirts / T-Shirts");
         if (top) selectedOutfit.push(top);
@@ -509,7 +555,6 @@
         if (top) selectedOutfit.push(top);
       }
 
-      // 2. Bottoms Selection
       if (weather.includes("Hot")) {
         const bottom = pickRandom("Shorts") || pickRandom("Lower / Joggers") || pickRandom("Jeans");
         if (bottom) selectedOutfit.push(bottom);
@@ -518,14 +563,12 @@
         if (bottom) selectedOutfit.push(bottom);
       }
 
-      // 3. Footwear & Accessories
       const shoes = pickRandom("Shoes / Sneakers");
       if (shoes) selectedOutfit.push(shoes);
 
       const accessory = pickRandom("Hats") || pickRandom("Glasses") || pickRandom("Accessories");
       if (accessory) selectedOutfit.push(accessory);
 
-      // Render Results
       const display = document.getElementById('outfitDisplay');
       const meta = document.getElementById('outfitMeta');
       display.innerHTML = '';
@@ -533,7 +576,7 @@
       meta.innerHTML = `Suggested for <strong>${weather}</strong> during <strong>${time}</strong> for a <strong>${occasion}</strong>`;
 
       if (selectedOutfit.length === 0) {
-        display.innerHTML = `<div class="empty-state">Not enough items in your closet to build a full outfit for this context. Add more items!</div>`;
+        display.innerHTML = `<div class="empty-state">Not enough items in your closet to build an outfit for this context. Snap more clothes!</div>`;
       } else {
         selectedOutfit.forEach(item => {
           display.innerHTML += `
@@ -549,7 +592,6 @@
       document.getElementById('resultCard').style.display = 'block';
     }
 
-    // Initialize Page
     initFilters();
   </script>
 </body>
