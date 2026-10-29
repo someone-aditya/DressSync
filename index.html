@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>DressSync — Sync Your Closet. Master Your Style.</title>
+  <title>DressSync — Wardrobe Dashboard & Style Generator</title>
   <style>
     :root {
       --bg: #0d0f17;
       --card-bg: #161926;
+      --card-hover: #1e2336;
       --primary: #8b5cf6;
       --primary-hover: #7c3aed;
+      --accent: #06b6d4;
       --text: #f3f4f6;
       --text-muted: #9ca3af;
       --border: #2e344e;
@@ -25,21 +27,23 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      line-height: 1.6;
-      padding-bottom: 60px;
+      display: flex;
+      min-height: 100vh;
     }
 
-    /* Navigation */
-    nav {
+    /* Sidebar Navigation */
+    aside {
+      width: 250px;
+      background: var(--card-bg);
+      border-right: 1px solid var(--border);
+      padding: 24px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 8%;
-      border-bottom: 1px solid var(--border);
+      flex-direction: column;
+      gap: 24px;
     }
 
     .logo {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 800;
       letter-spacing: -0.5px;
     }
@@ -48,57 +52,67 @@
       color: var(--primary);
     }
 
-    .auth-buttons {
+    .nav-links {
       display: flex;
-      gap: 12px;
+      flex-direction: column;
+      gap: 8px;
     }
 
-    .btn-auth {
-      background: var(--card-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 10px 16px;
+    .nav-item {
+      padding: 12px 16px;
       border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      color: var(--text-muted);
       cursor: pointer;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 8px;
-      transition: background 0.2s;
+      gap: 12px;
+      transition: all 0.2s;
     }
 
-    .btn-auth:hover {
-      background: #202538;
+    .nav-item:hover, .nav-item.active {
+      background: var(--primary);
+      color: #fff;
     }
 
-    /* Hero Section */
-    .hero {
-      text-align: center;
-      padding: 80px 20px 40px;
-      max-width: 800px;
-      margin: 0 auto;
+    /* Main Content Area */
+    main {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
     }
 
-    .hero h1 {
-      font-size: 3rem;
-      font-weight: 800;
-      margin-bottom: 16px;
-    }
-
-    .hero p {
-      font-size: 1.2rem;
-      color: var(--text-muted);
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 32px;
+    }
+
+    .view-section {
+      display: none;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    /* Form & Input Elements */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
     }
 
     .btn-primary {
       background: var(--primary);
       color: #fff;
       border: none;
-      padding: 14px 28px;
-      border-radius: 10px;
-      font-size: 1.1rem;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s;
@@ -108,23 +122,24 @@
       background: var(--primary-hover);
     }
 
-    /* "Start Dressing" Interactive Demo Box */
-    .dressing-box {
-      max-width: 600px;
-      margin: 40px auto 0;
-      background: var(--card-bg);
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 32px;
-      text-align: left;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    .dressing-box h3 {
-      margin-bottom: 20px;
-      font-size: 1.3rem;
+    .btn-outline:hover {
+      background: var(--card-hover);
     }
 
-    .input-group {
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
       margin-bottom: 16px;
     }
 
@@ -135,148 +150,407 @@
       margin-bottom: 6px;
     }
 
-    .input-group select {
+    .input-group select, .input-group input {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       background: var(--bg);
       color: var(--text);
       border: 1px solid var(--border);
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
-    .result-card {
-      margin-top: 24px;
-      padding: 16px;
-      background: var(--bg);
-      border-radius: 8px;
-      border: 1px dashed var(--primary);
-      display: none;
+    /* Wardrobe Category Tags & Items Grid */
+    .category-filter {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
     }
 
-    .result-card h4 {
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-
-    /* Features Grid */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-      max-width: 1000px;
-      margin: 80px auto 0;
-      padding: 0 20px;
-    }
-
-    .feature-card {
+    .tag-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
       background: var(--card-bg);
       border: 1px solid var(--border);
-      padding: 24px;
-      border-radius: 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      white-space: nowrap;
     }
 
-    .feature-card h3 {
-      margin-bottom: 10px;
-      font-size: 1.1rem;
+    .tag-chip.active {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border-color: var(--accent);
     }
 
-    .feature-card p {
-      color: var(--text-muted);
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      position: relative;
+    }
+
+    .item-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: contain;
+      margin-bottom: 12px;
+    }
+
+    .item-title {
+      font-weight: 700;
       font-size: 0.95rem;
+    }
+
+    .item-category {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Recommendation Showcase */
+    .outfit-display {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
     }
   </style>
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav>
+  <!-- Sidebar -->
+  <aside>
     <div class="logo">Dress<span>Sync</span></div>
-    <div class="auth-buttons">
-      <button class="btn-auth" onclick="alert('Google Sign-In will connect to Firebase Auth!')">
-        Continue with Google
-      </button>
-      <button class="btn-auth" onclick="alert('Facebook Sign-In will connect to Firebase Auth!')">
-        Continue with Facebook
-      </button>
+    <div class="nav-links">
+      <div class="nav-item active" onclick="switchTab('dashboard')">🏠 Dashboard</div>
+      <div class="nav-item" onclick="switchTab('wardrobe')">👔 My Wardrobe</div>
+      <div class="nav-item" onclick="switchTab('generator')">⚡ Start Dressing</div>
     </div>
-  </nav>
+  </aside>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <h1>Sync Your Closet.<br/>Master Your Style.</h1>
-    <p>Snap photos of your clothes, strip backgrounds automatically, and let AI build perfect daily outfits matched to weather and vibe.</p>
-    
-    <!-- Interactive Demo Widget -->
-    <div class="dressing-box">
-      <h3>⚡ Try the "Start Dressing" Demo</h3>
-      
-      <div class="input-group">
-        <label for="weather">What's the weather like?</label>
-        <select id="weather">
-          <option>☀️ Warm & Sunny (25°C)</option>
-          <option>☁️ Cool & Breezy (18°C)</option>
-          <option>🌧️ Cold & Rainy (12°C)</option>
-        </select>
+  <!-- Main Content -->
+  <main>
+
+    <!-- TAB 1: DASHBOARD -->
+    <section id="dashboard" class="view-section active">
+      <div class="header">
+        <h2>Welcome to Your Closet Overview</h2>
+        <button class="btn-primary" onclick="loadSampleItems()">+ Add Starter Wardrobe</button>
       </div>
 
-      <div class="input-group">
-        <label for="occasion">Where are you going?</label>
-        <select id="occasion">
-          <option>Casual Cafe / Hangout</option>
-          <option>Work / Office</option>
-          <option>Date Night</option>
-          <option>Gym / Workout</option>
-        </select>
+      <div class="card">
+        <h3>📊 Closet Statistics</h3>
+        <p style="color: var(--text-muted); margin-top: 8px;">
+          Total Items: <strong id="totalCount" style="color: var(--primary);">0</strong> | 
+          Categories Populated: <strong id="catCount" style="color: var(--accent);">0</strong>
+        </p>
       </div>
 
-      <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="generateOutfit()">
-        Start Dressing
-      </button>
-
-      <div class="result-card" id="outfitResult">
-        <h4>✨ Recommended Outfit Result:</h4>
-        <p id="outfitText"></p>
+      <div class="card">
+        <h3>🚀 Quick Start Guide</h3>
+        <ol style="margin-left: 20px; color: var(--text-muted); line-height: 2;">
+          <li>Click <strong>"My Wardrobe"</strong> to add clothes across categories like Shirts, Hoodies, Pants, Shoes, and Accessories.</li>
+          <li>Go to <strong>"Start Dressing"</strong> to select your weather, time, and occasion.</li>
+          <li>DressSync will randomize and pick the best combinations directly from your actual wardrobe!</li>
+        </ol>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Key Features -->
-  <section class="features">
-    <div class="feature-card">
-      <h3>📸 Background Removal</h3>
-      <p>Upload any picture of a shirt or pants—our system isolates the clothing item into a clean digital wardrobe PNG.</p>
-    </div>
-    <div class="feature-card">
-      <h3>🌤️ Smart Context</h3>
-      <p>Auto-detects live temperature and weather so you stay comfortable and styled everywhere you go.</p>
-    </div>
-    <div class="feature-card">
-      <h3>🎨 Style Harmony</h3>
-      <p>Built-in color wheel algorithms ensure tops, bottoms, and footwear never clash.</p>
-    </div>
-  </section>
+    <!-- TAB 2: WARDROBE -->
+    <section id="wardrobe" class="view-section">
+      <div class="header">
+        <h2>My Digital Wardrobe</h2>
+      </div>
+
+      <!-- Add New Item Form -->
+      <div class="card">
+        <h3>➕ Add Item to Wardrobe</h3>
+        <div class="form-grid" style="margin-top: 16px;">
+          <div class="input-group">
+            <label>Item Name</label>
+            <input type="text" id="itemName" placeholder="e.g. Vintage Denim Jacket">
+          </div>
+          <div class="input-group">
+            <label>Category</label>
+            <select id="itemCategory">
+              <option>Hats</option>
+              <option>Glasses</option>
+              <option>Accessories</option>
+              <option>Shirts / T-Shirts</option>
+              <option>Hoodies</option>
+              <option>Jackets</option>
+              <option>Jeans</option>
+              <option>Lower / Joggers</option>
+              <option>Pants / Formal</option>
+              <option>Shorts</option>
+              <option>Socks</option>
+              <option>Shoes / Sneakers</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Image URL (or mock image)</label>
+            <input type="text" id="itemImg" placeholder="https://via.placeholder.com/150">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="addItem()">Add to Closet</button>
+      </div>
+
+      <!-- Category Filter Chips -->
+      <div class="category-filter" id="filterChips">
+        <div class="tag-chip active" onclick="filterCategory('All')">All Items</div>
+      </div>
+
+      <!-- Items Grid -->
+      <div class="items-grid" id="wardrobeGrid">
+        <div class="empty-state">No items added yet. Click "+ Add Starter Wardrobe" or enter custom items above!</div>
+      </div>
+    </section>
+
+    <!-- TAB 3: START DRESSING GENERATOR -->
+    <section id="generator" class="view-section">
+      <div class="header">
+        <h2>Smart Outfit Generator</h2>
+      </div>
+
+      <div class="card">
+        <h3>🌤️ Context & Weather Settings</h3>
+        <div class="form-grid" style="margin-top: 16px;">
+          <div class="input-group">
+            <label>Weather Condition</label>
+            <select id="genWeather">
+              <option>☀️ Hot & Sunny</option>
+              <option>☁️ Cool & Breezy</option>
+              <option>🌧️ Cold & Rainy</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Time of Day</label>
+            <select id="genTime">
+              <option>🌅 Morning / Daytime</option>
+              <option>🌙 Night / Evening</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Occasion / Vibe</label>
+            <select id="genOccasion">
+              <option>Casual Hangout</option>
+              <option>Office / Work</option>
+              <option>Party / Date Night</option>
+              <option>Gym / Workout</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn-primary" style="width: 100%;" onclick="generateCombination()">✨ Generate Outfit From My Closet</button>
+      </div>
+
+      <div class="card" id="resultCard" style="display: none;">
+        <h3>🎉 Selected Outfit Combination</h3>
+        <p id="outfitMeta" style="color: var(--text-muted); margin-bottom: 16px;"></p>
+        <div class="outfit-display" id="outfitDisplay"></div>
+      </div>
+    </section>
+
+  </main>
 
   <script>
-    function generateOutfit() {
-      const weather = document.getElementById('weather').value;
-      const occasion = document.getElementById('occasion').value;
-      const resultBox = document.getElementById('outfitResult');
-      const text = document.getElementById('outfitText');
+    // Categories List
+    const categories = [
+      "Hats", "Glasses", "Accessories", "Shirts / T-Shirts", 
+      "Hoodies", "Jackets", "Jeans", "Lower / Joggers", 
+      "Pants / Formal", "Shorts", "Socks", "Shoes / Sneakers"
+    ];
 
-      let recommendation = "";
+    // Closet Data Store
+    let wardrobe = [];
 
-      if (weather.includes("Warm")) {
-        recommendation = "White Crewneck T-Shirt + Light Denim Shorts + Clean White Canvas Sneakers.";
-      } else if (weather.includes("Cool")) {
-        recommendation = "Navy Blue Denim Jacket + Plain White Tee + Black Slim Chinos + White Sneakers.";
-      } else {
-        recommendation = "Dark Charcoal Trench Coat + Oversized Hoodie + Black Trousers + Leather Boots.";
+    // Initialize Category Filters
+    function initFilters() {
+      const container = document.getElementById('filterChips');
+      categories.forEach(cat => {
+        const chip = document.createElement('div');
+        chip.className = 'tag-chip';
+        chip.innerText = cat;
+        chip.onclick = () => filterCategory(cat);
+        container.appendChild(chip);
+      });
+    }
+
+    // Switch Nav Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+    }
+
+    // Add Single Item
+    function addItem(nameInput, catInput, imgInput) {
+      const name = nameInput || document.getElementById('itemName').value;
+      const category = catInput || document.getElementById('itemCategory').value;
+      const img = imgInput || document.getElementById('itemImg').value || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&auto=format&fit=crop';
+
+      if (!name) return alert('Please enter an item name!');
+
+      wardrobe.push({ id: Date.now(), name, category, img });
+      
+      if (!nameInput) {
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemImg').value = '';
       }
 
-      text.innerHTML = `<strong>Selected Context:</strong> ${occasion} (${weather})<br/><strong>AI Suggestion:</strong> ${recommendation}`;
-      resultBox.style.display = "block";
+      updateUI();
     }
+
+    // Load Default Starter Items
+    function loadSampleItems() {
+      const samples = [
+        { name: "Black Baseball Cap", category: "Hats", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=200&auto=format&fit=crop" },
+        { name: "Dark Sunglasses", category: "Glasses", img: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=200&auto=format&fit=crop" },
+        { name: "White Plain Tee", category: "Shirts / T-Shirts", img: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=200&auto=format&fit=crop" },
+        { name: "Grey Oversized Hoodie", category: "Hoodies", img: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=200&auto=format&fit=crop" },
+        { name: "Blue Slim Jeans", category: "Jeans", img: "https://images.unsplash.com/photo-1542272604-780c36856d67?w=200&auto=format&fit=crop" },
+        { name: "Black Athletic Shorts", category: "Shorts", img: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=200&auto=format&fit=crop" },
+        { name: "White Canvas Sneakers", category: "Shoes / Sneakers", img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=200&auto=format&fit=crop" }
+      ];
+
+      samples.forEach(s => addItem(s.name, s.category, s.img));
+      alert('Starter wardrobe loaded successfully!');
+    }
+
+    // Update Dashboard & Wardrobe Grid
+    function updateUI(filteredCat = 'All') {
+      const grid = document.getElementById('wardrobeGrid');
+      grid.innerHTML = '';
+
+      const itemsToDisplay = filteredCat === 'All' 
+        ? wardrobe 
+        : wardrobe.filter(item => item.category === filteredCat);
+
+      if (itemsToDisplay.length === 0) {
+        grid.innerHTML = '<div class="empty-state">No items found in this category.</div>';
+      } else {
+        itemsToDisplay.forEach(item => {
+          grid.innerHTML += `
+            <div class="item-card">
+              <img src="${item.img}" alt="${item.name}">
+              <div class="item-title">${item.name}</div>
+              <div class="item-category">${item.category}</div>
+            </div>
+          `;
+        });
+      }
+
+      // Update Dashboard Stats
+      document.getElementById('totalCount').innerText = wardrobe.length;
+      const populatedCategories = new Set(wardrobe.map(i => i.category)).size;
+      document.getElementById('catCount').innerText = populatedCategories;
+    }
+
+    function filterCategory(cat) {
+      document.querySelectorAll('#filterChips .tag-chip').forEach(el => {
+        el.classList.toggle('active', el.innerText === cat || (cat === 'All' && el.innerText === 'All Items'));
+      });
+      updateUI(cat);
+    }
+
+    // Outfit Randomizer Logic based on Context
+    function generateCombination() {
+      if (wardrobe.length === 0) {
+        return alert("Your wardrobe is empty! Add items or click '+ Add Starter Wardrobe' first.");
+      }
+
+      const weather = document.getElementById('genWeather').value;
+      const time = document.getElementById('genTime').value;
+      const occasion = document.getElementById('genOccasion').value;
+
+      // Group wardrobe items by category
+      const grouped = {};
+      wardrobe.forEach(item => {
+        if (!grouped[item.category]) grouped[item.category] = [];
+        grouped[item.category].push(item);
+      });
+
+      // Selection logic based on weather
+      let selectedOutfit = [];
+
+      // Helper to pick random item from category array
+      const pickRandom = (catName) => {
+        if (grouped[catName] && grouped[catName].length > 0) {
+          const list = grouped[catName];
+          return list[Math.floor(Math.random() * list.length)];
+        }
+        return null;
+      };
+
+      // 1. Tops Selection
+      if (weather.includes("Cold")) {
+        const top = pickRandom("Hoodies") || pickRandom("Jackets") || pickRandom("Shirts / T-Shirts");
+        if (top) selectedOutfit.push(top);
+      } else {
+        const top = pickRandom("Shirts / T-Shirts") || pickRandom("Hoodies");
+        if (top) selectedOutfit.push(top);
+      }
+
+      // 2. Bottoms Selection
+      if (weather.includes("Hot")) {
+        const bottom = pickRandom("Shorts") || pickRandom("Lower / Joggers") || pickRandom("Jeans");
+        if (bottom) selectedOutfit.push(bottom);
+      } else {
+        const bottom = pickRandom("Jeans") || pickRandom("Pants / Formal") || pickRandom("Lower / Joggers");
+        if (bottom) selectedOutfit.push(bottom);
+      }
+
+      // 3. Footwear & Accessories
+      const shoes = pickRandom("Shoes / Sneakers");
+      if (shoes) selectedOutfit.push(shoes);
+
+      const accessory = pickRandom("Hats") || pickRandom("Glasses") || pickRandom("Accessories");
+      if (accessory) selectedOutfit.push(accessory);
+
+      // Render Results
+      const display = document.getElementById('outfitDisplay');
+      const meta = document.getElementById('outfitMeta');
+      display.innerHTML = '';
+
+      meta.innerHTML = `Suggested for <strong>${weather}</strong> during <strong>${time}</strong> for a <strong>${occasion}</strong>`;
+
+      if (selectedOutfit.length === 0) {
+        display.innerHTML = `<div class="empty-state">Not enough items in your closet to build a full outfit for this context. Add more items!</div>`;
+      } else {
+        selectedOutfit.forEach(item => {
+          display.innerHTML += `
+            <div class="item-card" style="border-color: var(--primary);">
+              <img src="${item.img}" alt="${item.name}">
+              <div class="item-title">${item.name}</div>
+              <div class="item-category" style="color: var(--primary);">${item.category}</div>
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('resultCard').style.display = 'block';
+    }
+
+    // Initialize Page
+    initFilters();
   </script>
 </body>
 </html>
